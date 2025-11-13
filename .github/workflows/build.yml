@@ -24,17 +24,11 @@ jobs:
     - name: Setup Android SDK
       uses: android-actions/setup-android@v3
       
-    - name: Grant execute permission for gradlew
-      run: chmod +x gradlew || echo "gradlew not found, will generate"
-      
-    - name: Generate Gradle Wrapper
-      run: gradle wrapper --gradle-version 8.5 || true
-      
-    - name: Make gradlew executable again
-      run: chmod +x gradlew
+    - name: Setup Gradle
+      uses: gradle/actions/setup-gradle@v3
       
     - name: Build Debug APK
-      run: ./gradlew assembleDebug --stacktrace
+      run: gradle assembleDebug --stacktrace
       
     - name: Upload APK Artifact
       uses: actions/upload-artifact@v4
@@ -47,26 +41,18 @@ jobs:
       uses: softprops/action-gh-release@v1
       with:
         tag_name: v11.0-build-${{ github.run_number }}
-        name: WiFi Spoofer v11.0 GPS Architecture - Build ${{ github.run_number }}
+        name: WiFi Spoofer v11.0 - Build ${{ github.run_number }}
         body: |
           ## WiFi Spoofer v11.0 - GPS Architecture
           
-          **Complete Rewrite - 99% Reliability!**
-          
-          ### Features:
-          - Bulletproof dual-level hooks
-          - System Server + Application hooks
-          - 99% reliability
-          - Android 12+ support
+          **Bulletproof dual-level hooks - 99% reliability!**
           
           ### Installation:
           1. Download APK below
-          2. Install APK
+          2. Install
           3. Enable in LSPosed (scope: android only)
           4. Reboot
           5. Done!
-          
-          Based on GPS Setter: https://github.com/jqssun/android-gps-setter
         files: app/build/outputs/apk/debug/*.apk
         draft: false
         prerelease: false
