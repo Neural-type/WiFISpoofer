@@ -1,59 +1,49 @@
-name: Build WiFi Spoofer APK
+name: Build APK
 
 on:
   push:
-    branches: [ main, master ]
+    branches: [ main ]
   pull_request:
-    branches: [ main, master ]
-  workflow_dispatch:
+    branches: [ main ]
 
 jobs:
   build:
     runs-on: ubuntu-latest
-    
+
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v4
-      
+    - uses: actions/checkout@v4
+    
     - name: Set up JDK 17
       uses: actions/setup-java@v4
       with:
         java-version: '17'
         distribution: 'temurin'
-        
+    
     - name: Setup Android SDK
       uses: android-actions/setup-android@v3
-      
-    - name: Setup Gradle
+    
+    - name: Grant execute permission for gradlew
+      run: chmod +x gradlew
+    
+    - name: Build with Gradle
       uses: gradle/actions/setup-gradle@v3
-      
-    - name: Build Debug APK
-      run: gradle assembleDebug --stacktrace
-      
-    - name: Upload APK Artifact
+    
+    - name: Build APK
+      run: ./gradlew assembleDebug --stacktrace
+    
+    - name: Upload APK
       uses: actions/upload-artifact@v4
       with:
-        name: wifi-spoofer-v11.0-apk
-        path: app/build/outputs/apk/debug/*.apk
-        
-    - name: Create GitHub Release
-      if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+        name: app-debug
+        path: app/build/outputs/apk/debug/app-debug.apk
+    
+    - name: Create Release
+      if: github.ref == 'refs/heads/main'
       uses: softprops/action-gh-release@v1
       with:
-        tag_name: v11.0-build-${{ github.run_number }}
-        name: WiFi Spoofer v11.0 - Build ${{ github.run_number }}
-        body: |
-          ## WiFi Spoofer v11.0 - GPS Architecture
-          
-          **Bulletproof dual-level hooks - 99% reliability!**
-          
-          ### Installation:
-          1. Download APK below
-          2. Install
-          3. Enable in LSPosed (scope: android only)
-          4. Reboot
-          5. Done!
-        files: app/build/outputs/apk/debug/*.apk
+        tag_name: v${{ github.run_number }}
+        name: Release v${{ github.run_number }}
+        files: app/build/outputs/apk/debug/app-debug.apk
         draft: false
         prerelease: false
       env:
