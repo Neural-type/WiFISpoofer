@@ -1,8 +1,0 @@
-<?xml version="1.0" encoding="utf-8"?>
-<resources>
-    <!-- Xposed Scope: ТОЛЬКО android (System Framework) -->
-    <!-- В v11 мы хукаем System Server, поэтому scope должен быть ТОЛЬКО android -->
-    <string-array name="xposed_scopes">
-        <item>android</item>
-    </string-array>
-</resources>

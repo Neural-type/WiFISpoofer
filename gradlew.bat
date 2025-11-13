@@ -1,2 +1,2 @@
-@rem Execute Gradle
+@echo off
 gradle %*

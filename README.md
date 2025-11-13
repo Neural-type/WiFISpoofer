@@ -1,10 +1,19 @@
-# WiFi Spoofer v11.0
+# WiFi Spoofer v11.1
 
-Bulletproof WiFi spoofing with dual-level hooks.
+Full-featured WiFi spoofing with dual-level hooks.
+
+## Features
+- Add/Remove fake networks
+- Scan real networks
+- Block/Allow networks (blacklist/whitelist)
+- Global system-level hooks
 
 ## Installation
-1. Download APK
-2. Enable in LSPosed (scope: android only)
-3. Reboot
+1. Download APK from Releases
+2. Install APK
+3. Enable in LSPosed (scope: android)
+4. Reboot
+5. Open app and configure networks
 
-Based on GPS Setter
+## GitHub Build
+APK automatically builds on push to main branch.

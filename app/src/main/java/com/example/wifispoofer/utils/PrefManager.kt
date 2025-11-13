@@ -12,17 +12,6 @@ import kotlinx.coroutines.launch
 import org.json.JSONArray
 import org.json.JSONObject
 
-/**
- * PrefManager - Управление настройками приложения
- * Записывает настройки в SharedPreferences
- * 
- * ВАЖНО: Использует MODE_WORLD_READABLE для совместимости с XSharedPreferences
- * На новых Android это может вызвать SecurityException, поэтому есть fallback
- * 
- * @author Neural-type
- * @version 11.0
- * @based_on GPS Setter PrefManager.kt
- */
 @SuppressLint("WorldReadableFiles")
 object PrefManager {
 
@@ -35,21 +24,14 @@ object PrefManager {
     private const val DYNAMIC_MODE = "dynamic_mode"
     private const val SCANNING_MODE = "scanning_mode"
 
-    /**
-     * SharedPreferences с MODE_WORLD_READABLE
-     * Пытаемся сделать world-readable для XSharedPreferences
-     * Если не получается - fallback на MODE_PRIVATE
-     */
     private val pref: SharedPreferences by lazy {
         try {
-            // Пробуем MODE_WORLD_READABLE (deprecated но нужно для Xposed)
             @Suppress("DEPRECATION")
             App.instance.getSharedPreferences(
                 "${BuildConfig.APPLICATION_ID}_prefs",
                 Context.MODE_WORLD_READABLE
             )
         } catch (e: SecurityException) {
-            // Fallback на MODE_PRIVATE для новых Android
             android.util.Log.w("WiFiSpoofer", "MODE_WORLD_READABLE failed, using MODE_PRIVATE")
             App.instance.getSharedPreferences(
                 "${BuildConfig.APPLICATION_ID}_prefs",
@@ -58,90 +40,53 @@ object PrefManager {
         }
     }
 
-    // ═══════════════════════════════════════════════════════════════
-    // ОСНОВНЫЕ НАСТРОЙКИ
-    // ═══════════════════════════════════════════════════════════════
-
-    /**
-     * Включен ли модуль
-     */
     var isEnabled: Boolean
         get() = pref.getBoolean(MODULE_ENABLED, false)
         set(value) {
             pref.edit().putBoolean(MODULE_ENABLED, value).apply()
         }
 
-    /**
-     * Скрывать ли все реальные сети
-     */
     var hideRealNetworks: Boolean
         get() = pref.getBoolean(HIDE_REAL_NETWORKS, false)
         set(value) {
             pref.edit().putBoolean(HIDE_REAL_NETWORKS, value).apply()
         }
 
-    /**
-     * Режим работы списка SSID:
-     * true = whitelist (показывать только выбранные)
-     * false = blacklist (блокировать только выбранные)
-     */
     var whitelistMode: Boolean
         get() = pref.getBoolean(WHITELIST_MODE, false)
         set(value) {
             pref.edit().putBoolean(WHITELIST_MODE, value).apply()
         }
 
-    /**
-     * Случайное изменение уровня сигнала (±5 dBm)
-     */
     var randomSignal: Boolean
         get() = pref.getBoolean(RANDOM_SIGNAL, false)
         set(value) {
             pref.edit().putBoolean(RANDOM_SIGNAL, value).apply()
         }
 
-    /**
-     * Динамический режим (сети появляются/исчезают)
-     */
     var dynamicMode: Boolean
         get() = pref.getBoolean(DYNAMIC_MODE, false)
         set(value) {
             pref.edit().putBoolean(DYNAMIC_MODE, value).apply()
         }
 
-    /**
-     * Режим сканирования (для WiFi Spoofer чтобы видеть реальные сети)
-     */
     var scanningMode: Boolean
         get() = pref.getBoolean(SCANNING_MODE, false)
         set(value) {
             pref.edit().putBoolean(SCANNING_MODE, value).apply()
         }
 
-    /**
-     * Список заблокированных/разрешенных SSID (через запятую)
-     */
     var blockedSSIDs: String
         get() = pref.getString(BLOCKED_SSIDS, "") ?: ""
         set(value) {
             pref.edit().putString(BLOCKED_SSIDS, value).apply()
         }
 
-    // ═══════════════════════════════════════════════════════════════
-    // ФЕЙКОВЫЕ СЕТИ
-    // ═══════════════════════════════════════════════════════════════
-
-    /**
-     * Получить список фейковых сетей
-     */
     fun getFakeNetworks(): List<FakeNetwork> {
         val jsonStr = pref.getString(FAKE_NETWORKS, "[]") ?: "[]"
         return parseFakeNetworks(jsonStr)
     }
 
-    /**
-     * Сохранить список фейковых сетей
-     */
     fun saveFakeNetworks(networks: List<FakeNetwork>) {
         runInBackground {
             val jsonArray = JSONArray()
@@ -162,37 +107,21 @@ object PrefManager {
         }
     }
 
-    /**
-     * Добавить одну фейковую сеть
-     */
     fun addFakeNetwork(network: FakeNetwork) {
         val networks = getFakeNetworks().toMutableList()
         networks.add(network)
         saveFakeNetworks(networks)
     }
 
-    /**
-     * Удалить фейковую сеть
-     */
     fun removeFakeNetwork(ssid: String) {
         val networks = getFakeNetworks().filter { it.ssid != ssid }
         saveFakeNetworks(networks)
     }
 
-    /**
-     * Очистить все фейковые сети
-     */
     fun clearFakeNetworks() {
         pref.edit().putString(FAKE_NETWORKS, "[]").apply()
     }
 
-    // ═══════════════════════════════════════════════════════════════
-    // ВСПОМОГАТЕЛЬНЫЕ МЕТОДЫ
-    // ═══════════════════════════════════════════════════════════════
-
-    /**
-     * Парсинг JSON строки с фейковыми сетями
-     */
     private fun parseFakeNetworks(jsonStr: String): List<FakeNetwork> {
         val networks = ArrayList<FakeNetwork>()
         
@@ -221,10 +150,6 @@ object PrefManager {
         return networks
     }
 
-    /**
-     * Запуск операции в фоновом потоке
-     * Паттерн из GPS Setter
-     */
     @OptIn(DelicateCoroutinesApi::class)
     private fun runInBackground(method: suspend () -> Unit) {
         GlobalScope.launch(Dispatchers.IO) {
@@ -233,20 +158,14 @@ object PrefManager {
     }
 }
 
-/**
- * Data class для фейковой WiFi сети
- */
 data class FakeNetwork(
     val ssid: String,
     val bssid: String,
-    val level: Int,        // от -100 до 0 dBm
-    val frequency: Int,    // 2412-2484 (2.4GHz) или 5150-5825 (5GHz)
-    val capabilities: String  // "[WPA2-PSK-CCMP][ESS]", "[ESS]", и т.д.
+    val level: Int,
+    val frequency: Int,
+    val capabilities: String
 ) {
     companion object {
-        /**
-         * Генерация случайного MAC адреса (BSSID)
-         */
         fun generateRandomBSSID(): String {
             val random = java.util.Random()
             return String.format(

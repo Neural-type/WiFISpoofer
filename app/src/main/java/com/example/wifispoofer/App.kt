@@ -4,14 +4,7 @@ import android.app.Application
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 
-/**
- * Application класс WiFi Spoofer
- * 
- * @author Neural-type
- * @version 11.0
- */
 class App : Application() {
-
     val globalScope = CoroutineScope(Dispatchers.Default)
 
     companion object {
@@ -20,7 +13,7 @@ class App : Application() {
 
         fun commonInit() {
             if (BuildConfig.DEBUG) {
-                android.util.Log.d("WiFiSpoofer", "App initialized in DEBUG mode")
+                android.util.Log.d("WiFiSpoofer", "App initialized")
             }
         }
     }
