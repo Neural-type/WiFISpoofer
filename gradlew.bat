@@ -1,0 +1,2 @@
+﻿@rem Execute Gradle
+gradle %*

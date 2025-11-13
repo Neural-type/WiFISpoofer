@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    package="com.example.wifispoofer">
+
+    <!-- Разрешения -->
+    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
+    <uses-permission android:name="android.permission.CHANGE_WIFI_STATE" />
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+    <uses-permission android:name="android.permission.INTERNET" />
+
+    <application
+        android:name=".App"
+        android:allowBackup="true"
+        android:icon="@mipmap/ic_launcher"
+        android:label="@string/app_name"
+        android:roundIcon="@mipmap/ic_launcher_round"
+        android:supportsRtl="true"
+        android:theme="@style/Theme.WiFiSpoofer"
+        tools:targetApi="31">
+
+        <!-- Main Activity -->
+        <activity
+            android:name=".MainActivity"
+            android:exported="true"
+            android:theme="@style/Theme.WiFiSpoofer">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+
+        <!-- ═══════════════════════════════════════════════════ -->
+        <!-- XPOSED MODULE METADATA                               -->
+        <!-- ═══════════════════════════════════════════════════ -->
+
+        <!-- Это Xposed модуль -->
+        <meta-data
+            android:name="xposedmodule"
+            android:value="true" />
+
+        <!-- Описание модуля -->
+        <meta-data
+            android:name="xposeddescription"
+            android:value="WiFi Spoofer v11 - Global WiFi network spoofing with dual-level hooks" />
+
+        <!-- Минимальная версия Xposed API -->
+        <meta-data
+            android:name="xposedminversion"
+            android:value="93" />
+
+        <!-- Разрешить доступ к SharedPreferences -->
+        <meta-data
+            android:name="xposedsharedprefs"
+            android:value="true" />
+
+        <!-- Scope: Только android (System Framework) -->
+        <!-- В v11 мы хукаем System Server напрямую! -->
+        <meta-data
+            android:name="xposedscope"
+            android:resource="@array/xposed_scopes" />
+
+    </application>
+
+</manifest>
