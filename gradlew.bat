@@ -1,2 +1,2 @@
-﻿@rem Execute Gradle
+@rem Execute Gradle
 gradle %*
